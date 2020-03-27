@@ -1,6 +1,6 @@
 #include "EEPROMP.h"
 
-EEPROMP& EEPROMP::getEEPROMP() {
+EEPROMP& EEPROMP::getEeprom() {
   static EEPROMP _eeprom;
   return _eeprom;
 }
@@ -43,21 +43,26 @@ void EEPROMP::setDataPinsTo(uint8_t mode) const {
   }
 }
 
-byte EEPROMP::readByte(uint16_t address) const {
+bool EEPROMP::readByte(uint16_t address, byte* data) const {
+  if (_endAddress == 0) return false;
   setDataPinsTo(INPUT);
   setAddress(address);
   digitalWrite(EEP_OE, LOW);
 
-  byte data = 0;
   for (uint8_t pin = DATA_BIT7, i=0; pin >= DATA_BIT0; pin--, i++) {
-    data |= digitalRead(pin) >> i;
+    *data |= digitalRead(pin) >> i;
   }
 
   digitalWrite(EEP_OE, HIGH);
-  return data;
+  return true;
 }
 
-void EEPROMP::writeByte(uint16_t address, byte data) const {
+bool EEPROMP::readArray(uint16_t startAddress, byte* data, int size) const {
+  if (_endAddress == 0) return false;
+}
+
+bool EEPROMP::writeByte(uint16_t address, byte data) const {
+  if (_endAddress == 0) return false;
   digitalWrite(EEP_OE, HIGH);
   setDataPinsTo(OUTPUT);
   setAddress(address);
@@ -71,13 +76,20 @@ void EEPROMP::writeByte(uint16_t address, byte data) const {
   digitalWrite(EEP_WE, HIGH);
   //ToDo wait for the write cycle to finish by polling I/O7
   delay(10); // replace this!
+  return true;
 }
 
-void EEPROMP::printContents() const {
+bool EEPROMP::writeArray(uint16_t address, byte* data, int size) const {
+  if (_endAddress == 0) return false;
+}
+
+bool EEPROMP::printContents() const {
+  if (_endAddress == 0) return false;
+  Serial.println("Reading EEPROM");
   for (uint16_t base = 0; base <= _endAddress; base +=16) {
     byte data[16] = {0};
     for (uint16_t offset = 0; offset <= 15; offset++) {
-      data[offset] = readByte(base + offset);
+      if (!readByte(base + offset, &data[offset])) return false;
     }
     char buf[56];
     sprintf(buf, "%04x:  %02x %02x %02x %02x %02x %02x %02x %02x   %02x %02x %02x %02x %02x %02x %02x %02x",
@@ -87,5 +99,6 @@ void EEPROMP::printContents() const {
             data[12], data[13], data[14], data[15]);
     Serial.println(buf);
   }
+  Serial.println("Done.");
+  return true;
 }
-
