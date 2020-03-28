@@ -2,29 +2,26 @@
 
 EEPROMP &EEPROMP::getEeprom()
 {
-  static EEPROMP _eeprom;
-  return _eeprom;
+  static EEPROMP eepromp;
+  return eepromp;
 }
 
-bool EEPROMP::setChip(Chip chip)
-{
-  for (int i = 0; i < sizeof(_chipAddressLines) / sizeof(_chipAddressLines[0]); i++)
-  {
-    if (_chipAddressLines[i][0] == chip)
-    {
-      setAddressLines(_chipAddressLines[chip][1]);
-      return true;
-    }
-  }
-  return false;
-}
-
-bool EEPROMP::setAddressLines(byte numAddressLines)
+bool EEPROMP::setChip(const Chip chip)
 {
   if (_endAddress != 0)
     return false;
-  _endAddress = pow(2, (float)numAddressLines) - 1;
 
+  initPins();
+  return setAddressLines(_chipAddressLines[static_cast<int>(chip)]);
+}
+
+bool EEPROMP::setAddressLines(int numAddressLines)
+{
+  _endAddress = pow(2, numAddressLines) - 1;
+}
+
+void EEPROMP::initPins() const
+{
   digitalWrite(SR_DATA, LOW);
   pinMode(SR_DATA, OUTPUT);
 
@@ -50,20 +47,18 @@ void EEPROMP::latchAddress() const
 
 void EEPROMP::setAddress(uint16_t address) const
 {
-  shiftOut(SR_DATA, SR_CLOCK, LSBFIRST, (uint8_t)address);
-  shiftOut(SR_DATA, SR_CLOCK, LSBFIRST, (uint8_t)(address >> 8));
+  shiftOut(SR_DATA, SR_CLOCK, LSBFIRST, static_cast<uint8_t>(address));
+  shiftOut(SR_DATA, SR_CLOCK, LSBFIRST, static_cast<uint8_t>(address >> 8));
   latchAddress();
 }
 
 void EEPROMP::setDataPinsTo(uint8_t mode) const
 {
   for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
-  {
     pinMode(pin, mode);
-  }
 }
 
-bool EEPROMP::readByte(uint16_t address, byte *data) const
+bool EEPROMP::readByte(uint16_t address, byte &data) const
 {
   if (_endAddress == 0)
     return false;
@@ -75,10 +70,10 @@ bool EEPROMP::readByte(uint16_t address, byte *data) const
   delayMicroseconds(1);
 
   // read the byte value one bit at a time
-  *data = 0x00;
-  for (uint8_t pin = DATA_BIT7; pin >= DATA_BIT0; pin--)
+  data = 0x00;
+  for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
   {
-    *data |= digitalRead(pin) << pin - DATA_BIT0;
+    data |= digitalRead(pin) << (pin - DATA_BIT0);
   }
 
   digitalWrite(EEP_OE, HIGH);
@@ -89,14 +84,13 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
 {
   if (_endAddress == 0)
     return false;
-  uint16_t address = startAddress;
+
   for (int offset = 0; offset < size; offset++)
   {
-    if (!readByte(address + offset, &data[offset]))
-    {
+    if (!readByte(startAddress + offset, data[offset]))
       return false;
-    }
   }
+
   return true;
 }
 
@@ -105,11 +99,10 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
   // change I/O7 to input and turn output enable on
   pinMode(DATA_BIT7, INPUT);
   digitalWrite(EEP_OE, LOW);
-  delayMicroseconds(1);
 
   // reading I/O7 will return the opposite of what was written
   // until the write is complete
-  while (bit7Value != digitalRead(DATA_BIT7))
+  while (digitalRead(DATA_BIT7) != bit7Value)
   {
     delayMicroseconds(1);
   }
@@ -127,15 +120,9 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
   setAddress(address);
 
   // send the byte value one bit at a time
-  byte bit7Value;
   for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
   {
-    digitalWrite(pin, data & 1);
-    if (pin == DATA_BIT7)
-    {
-      bit7Value = data & 1;
-    }
-    data = data >> 1;
+    digitalWrite(pin, data & (1 << pin - DATA_BIT0));
   }
 
   // start the write cycle
@@ -144,35 +131,38 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
   digitalWrite(EEP_WE, HIGH);
 
   // wait for the write cycle to finish
+  byte bit7Value = data & (1 << 7);
   pollTillWriteComplete(bit7Value);
   return true;
 }
 
-bool EEPROMP::writeArray(uint16_t address, byte *data, int size) const
+bool EEPROMP::writeArray(uint16_t startAddress, byte *data, int size) const
 {
   if (_endAddress == 0)
     return false;
+
   for (int offset = 0; offset < size; offset++)
   {
-    if (!writeByte(address + offset, data[offset]))
-    {
+    if (!writeByte(startAddress + offset, data[offset]))
       return false;
-    }
   }
   return true;
 }
 
-bool EEPROMP::printContents(void (*callback)(uint16_t, byte *, int)) const
+bool EEPROMP::printContents(void (*callback)(uint16_t address, byte *data, size_t dataSize)) const
 {
   if (_endAddress == 0)
     return false;
 
-  for (uint16_t base = 0; base <= _endAddress; base += 16)
+  const size_t dataSize = 16;
+
+  for (uint16_t baseAddress = 0; baseAddress <= _endAddress - dataSize; baseAddress += dataSize)
   {
-    byte data[16] = {0};
-    if (!readArray(base, data, sizeof(data)))
+    byte data[dataSize] = {0};
+    if (!readArray(baseAddress, data, dataSize))
       return false;
-    (*callback)(base, data, sizeof(data));
+
+    (*callback)(baseAddress, data, dataSize);
   }
 
   return true;
