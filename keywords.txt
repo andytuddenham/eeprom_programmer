@@ -13,6 +13,7 @@ EEPROMP	KEYWORD1
 #######################################
 
 getEeprom	KEYWORD2
+setChip	KEYWORD2
 readByte	KEYWORD2
 readArray	KEYWORD2
 writeByte	KEYWORD2
@@ -22,4 +23,7 @@ printContents	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+AT28C64	LITERAL1
+AT28C256	LITERAL1
 
