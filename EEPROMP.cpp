@@ -162,7 +162,7 @@ bool EEPROMP::printContents(void (*callback)(uint16_t address, byte *data, size_
     if (!readArray(baseAddress, data, dataSize))
       return false;
 
-    (*callback)(baseAddress, data, dataSize);
+    callback(baseAddress, data, dataSize);
   }
 
   return true;
