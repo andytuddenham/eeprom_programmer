@@ -1,1 +1,1 @@
-# eeprom_programmer
+# EEPROM Programmer
