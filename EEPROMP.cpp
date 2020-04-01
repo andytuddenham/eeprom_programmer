@@ -105,7 +105,7 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 
   // reading I/O7 will return the opposite of what was written
   // until the write is complete
-  while (digitalRead(DATA_BIT7) << 7 != bit7Value)
+  while (digitalRead(DATA_BIT7) != bit7Value)
   {
     delayMicroseconds(1);
   }
@@ -134,7 +134,7 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
   digitalWrite(EEP_WE, HIGH);
 
   // wait for the write cycle to finish
-  byte bit7Value = data & (1 << 7);
+  byte bit7Value = (data >> 7) & 0x01;
   pollTillWriteComplete(bit7Value);
   return true;
 }

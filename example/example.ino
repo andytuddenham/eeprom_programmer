@@ -23,7 +23,7 @@ void setup()
 void printData(uint16_t address, byte *data, size_t dataSize)
 {
     //  %04x: %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x
-    size_t buffSize = 5 /*"%04x:"*/ + ceil((float)dataSize / 4) /*" "*/ + (2 * dataSize) /*"%02x"*/ + 1 /*null string termination*/;
+    size_t buffSize = 5 /*"%04x:"*/ + ceil(static_cast<float>(dataSize) / 4) /*" "*/ + (2 * dataSize) /*"%02x"*/ + 1 /*null string termination*/;
     char buff[buffSize];
 
     sprintf(buff, "%04x:", address);
