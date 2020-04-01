@@ -8,16 +8,19 @@ EEPROMP &EEPROMP::getEeprom()
 
 bool EEPROMP::setChip(const Chip chip)
 {
-  if (_endAddress != 0)
-    return false;
-
-  initPins();
-  return setAddressLines(_chipAddressLines[static_cast<int>(chip)]);
+  bool success = setAddressLines(_chipAddressLines[static_cast<int>(chip)]);
+  if (success)
+    initPins();
+  return success;
 }
 
 bool EEPROMP::setAddressLines(int numAddressLines)
 {
+  if (_endAddress != 0)
+    return false;
+
   _endAddress = pow(2, numAddressLines) - 1;
+  return true;
 }
 
 void EEPROMP::initPins() const
@@ -102,7 +105,7 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 
   // reading I/O7 will return the opposite of what was written
   // until the write is complete
-  while (digitalRead(DATA_BIT7) != bit7Value)
+  while (digitalRead(DATA_BIT7) << 7 != bit7Value)
   {
     delayMicroseconds(1);
   }
