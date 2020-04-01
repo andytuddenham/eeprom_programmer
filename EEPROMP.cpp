@@ -134,7 +134,7 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
   digitalWrite(EEP_WE, HIGH);
 
   // wait for the write cycle to finish
-  byte bit7Value = (data >> 7) & 0x01;
+  byte bit7Value = data >> 7;
   pollTillWriteComplete(bit7Value);
   return true;
 }
