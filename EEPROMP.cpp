@@ -125,7 +125,7 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
   // send the byte value one bit at a time
   for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
   {
-    digitalWrite(pin, data & (1 << pin - DATA_BIT0));
+    digitalWrite(pin, (data >> pin - DATA_BIT0) & 0x01);
   }
 
   // start the write cycle
