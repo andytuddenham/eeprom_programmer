@@ -39,6 +39,9 @@ void EEPROMP::initPins() const
 
   digitalWrite(EEP_WE, HIGH); // make sure WE is disabled before setting pin mode to OUTPUT
   pinMode(EEP_WE, OUTPUT);
+
+  digitalWrite(LED_BUILTIN, LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void EEPROMP::latchAddress() const
@@ -103,12 +106,19 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
   pinMode(DATA_BIT7, INPUT);
   digitalWrite(EEP_OE, LOW);
 
+  // Indicate we are entering the loop
+  digitalWrite(LED_BUILTIN, HIGH);
+
   // reading I/O7 will return the opposite of what was written
   // until the write is complete
   while (digitalRead(DATA_BIT7) != bit7Value)
   {
     delayMicroseconds(1);
   }
+
+  // Indicate that we are now out of the loop
+  digitalWrite(LED_BUILTIN, LOW);
+
   delayMicroseconds(1);
 }
 
