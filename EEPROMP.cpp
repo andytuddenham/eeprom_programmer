@@ -64,6 +64,15 @@ void EEPROMP::setDataPinsTo(uint8_t mode) const
     pinMode(pin, mode);
 }
 
+void EEPROMP::readByteFromEeprom(byte &data) const {
+  // read the byte value one bit at a time
+  data = 0x00;
+  for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
+  {
+    data |= digitalRead(pin) << (pin - DATA_BIT0);
+  }
+}
+
 bool EEPROMP::readByte(uint16_t address, byte &data) const
 {
   if (_endAddress == 0)
@@ -71,16 +80,11 @@ bool EEPROMP::readByte(uint16_t address, byte &data) const
 
   // prepare to read
   setDataPinsTo(INPUT);
-  setAddress(address);
   digitalWrite(EEP_OE, LOW);
-  delayMicroseconds(1);
 
-  // read the byte value one bit at a time
-  data = 0x00;
-  for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
-  {
-    data |= digitalRead(pin) << (pin - DATA_BIT0);
-  }
+  setAddress(address);
+  delayMicroseconds(1);
+  readByteFromEeprom(data);
 
   digitalWrite(EEP_OE, HIGH);
   return true;
@@ -91,11 +95,19 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
   if (_endAddress == 0)
     return false;
 
+  // prepare to read
+  setDataPinsTo(INPUT);
+  digitalWrite(EEP_OE, LOW);
+
   for (int offset = 0; offset < size; offset++)
   {
-    if (!readByte(startAddress + offset, data[offset]))
-      return false;
+    setAddress(startAddress + offset);
+    delayMicroseconds(1);
+    readByteFromEeprom(data[offset]);
+    
   }
+  delayMicroseconds(1);
+  digitalWrite(EEP_OE, HIGH);
 
   return true;
 }
