@@ -64,6 +64,12 @@ void EEPROMP::setDataPinsTo(uint8_t mode) const
     pinMode(pin, mode);
 }
 
+void EEPROMP::readSetup() const {
+  // prepare to read
+  setDataPinsTo(INPUT);
+  digitalWrite(EEP_OE, LOW);
+}
+
 void EEPROMP::readByteFromEeprom(byte &data) const {
   // read the byte value one bit at a time
   data = 0x00;
@@ -78,9 +84,7 @@ bool EEPROMP::readByte(uint16_t address, byte &data) const
   if (_endAddress == 0)
     return false;
 
-  // prepare to read
-  setDataPinsTo(INPUT);
-  digitalWrite(EEP_OE, LOW);
+  readSetup();
 
   setAddress(address);
   delayMicroseconds(1);
@@ -95,9 +99,7 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
   if (_endAddress == 0)
     return false;
 
-  // prepare to read
-  setDataPinsTo(INPUT);
-  digitalWrite(EEP_OE, LOW);
+  readSetup();
 
   for (int offset = 0; offset < size; offset++)
   {
@@ -114,9 +116,7 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
 
 void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 {
-  // change I/O7 to input and turn output enable on
-  pinMode(DATA_BIT7, INPUT);
-  digitalWrite(EEP_OE, LOW);
+  readSetup();
 
   // Indicate we are entering the loop
   digitalWrite(LED_BUILTIN, HIGH);
@@ -130,8 +130,6 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 
   // Indicate that we are now out of the loop
   digitalWrite(LED_BUILTIN, LOW);
-
-  delayMicroseconds(1);
 }
 
 bool EEPROMP::writeByte(uint16_t address, byte data) const
