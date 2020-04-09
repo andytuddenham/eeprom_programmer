@@ -55,7 +55,8 @@ private:
   void latchAddress() const;
   void setAddress(uint16_t address) const;
   void setDataPinsTo(uint8_t mode) const;
-  void readSetup() const;
-  void readByteFromEeprom(byte &data) const;
+  void preRead() const;
+  void postRead() const;
+  byte readDataPins() const;
   void pollTillWriteComplete(byte bit7Value) const;
 };

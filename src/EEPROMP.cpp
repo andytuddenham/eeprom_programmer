@@ -64,19 +64,27 @@ void EEPROMP::setDataPinsTo(uint8_t mode) const
     pinMode(pin, mode);
 }
 
-void EEPROMP::readSetup() const {
+void EEPROMP::preRead() const
+{
   // prepare to read
   setDataPinsTo(INPUT);
   digitalWrite(EEP_OE, LOW);
 }
 
-void EEPROMP::readByteFromEeprom(byte &data) const {
+void EEPROMP::postRead() const
+{
+  digitalWrite(EEP_OE, HIGH);
+}
+
+byte EEPROMP::readDataPins() const
+{
   // read the byte value one bit at a time
-  data = 0x00;
+  byte data = 0x00;
   for (uint8_t pin = DATA_BIT0; pin <= DATA_BIT7; pin++)
   {
     data |= digitalRead(pin) << (pin - DATA_BIT0);
   }
+  return data;
 }
 
 bool EEPROMP::readByte(uint16_t address, byte &data) const
@@ -84,13 +92,13 @@ bool EEPROMP::readByte(uint16_t address, byte &data) const
   if (_endAddress == 0)
     return false;
 
-  readSetup();
+  preRead();
 
   setAddress(address);
   delayMicroseconds(1);
-  readByteFromEeprom(data);
+  data = readDataPins();
 
-  digitalWrite(EEP_OE, HIGH);
+  postRead();
   return true;
 }
 
@@ -99,24 +107,24 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
   if (_endAddress == 0)
     return false;
 
-  readSetup();
+  preRead();
 
   for (int offset = 0; offset < size; offset++)
   {
     setAddress(startAddress + offset);
     delayMicroseconds(1);
-    readByteFromEeprom(data[offset]);
+    data[offset] = readDataPins();
     
   }
   delayMicroseconds(1);
-  digitalWrite(EEP_OE, HIGH);
+  postRead();
 
   return true;
 }
 
 void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 {
-  readSetup();
+  preRead();
 
   // Indicate we are entering the loop
   digitalWrite(LED_BUILTIN, HIGH);
@@ -130,6 +138,7 @@ void EEPROMP::pollTillWriteComplete(byte bit7Value) const
 
   // Indicate that we are now out of the loop
   digitalWrite(LED_BUILTIN, LOW);
+  postRead();
 }
 
 bool EEPROMP::writeByte(uint16_t address, byte data) const
@@ -138,7 +147,6 @@ bool EEPROMP::writeByte(uint16_t address, byte data) const
     return false;
 
   // prepare to write
-  digitalWrite(EEP_OE, HIGH);
   setDataPinsTo(OUTPUT);
   setAddress(address);
 
