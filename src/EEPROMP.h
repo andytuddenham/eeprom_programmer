@@ -24,6 +24,7 @@ public:
   bool readArray(uint16_t startAddress, byte *data, int size) const;
   bool writeByte(uint16_t address, byte data) const;
   bool writeArray(uint16_t startAddress, byte *data, int size) const;
+  bool erase() const;
   bool printContents(void (*callback)(uint16_t address, byte *data, size_t dataSize)) const;
 
   EEPROMP(EEPROMP const &) = delete;

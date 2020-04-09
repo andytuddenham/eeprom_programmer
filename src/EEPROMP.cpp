@@ -114,9 +114,9 @@ bool EEPROMP::readArray(uint16_t startAddress, byte *data, int size) const
     setAddress(startAddress + offset);
     delayMicroseconds(1);
     data[offset] = readDataPins();
-    
   }
   delayMicroseconds(1);
+
   postRead();
 
   return true;
@@ -175,6 +175,19 @@ bool EEPROMP::writeArray(uint16_t startAddress, byte *data, int size) const
   for (int offset = 0; offset < size; offset++)
   {
     if (!writeByte(startAddress + offset, data[offset]))
+      return false;
+  }
+  return true;
+}
+
+bool EEPROMP::erase() const
+{
+  if (_endAddress == 0)
+    return false;
+
+  for (int address = 0; address <= _endAddress; address++)
+  {
+    if (!writeByte(address, 0xff))
       return false;
   }
   return true;
