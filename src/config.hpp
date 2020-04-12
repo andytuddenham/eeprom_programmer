@@ -22,6 +22,18 @@ struct Config
   // DATA_ eeprom data pins - must be consecutive ascending pins
   uint8_t DATA_BIT0;
   uint8_t DATA_BIT7;
+
+  bool operator==(const Config& cfg) const
+  {
+    return size == cfg.size && SR_CLOCK == cfg.SR_CLOCK && SR_LATCH == cfg.SR_LATCH
+           && SR_DATA == cfg.SR_DATA && EEP_OE == cfg.EEP_OE && EEP_WE == cfg.EEP_WE
+           && DATA_BIT0 == cfg.DATA_BIT0 && DATA_BIT7 == cfg.DATA_BIT7;
+  }
 };
+
+constexpr size_t AT28C64_size = static_cast<size_t>(pow(2, 13)) - 1;
+constexpr size_t AT28C256_size = static_cast<size_t>(pow(2, 13)) - 1;
+constexpr Config suggested_AT28C64_config = {AT28C64_size, A2, A3, 10, A4, A5, 2, 9};
+constexpr Config suggested_AT28C256_config = {AT28C256_size, A2, A3, 10, A4, A5, 2, 9};
 
 } // namespace ext_memory
