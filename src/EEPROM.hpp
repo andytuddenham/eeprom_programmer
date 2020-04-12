@@ -10,6 +10,7 @@ namespace ext_memory
 class EEPROM
 {
 public:
+  EEPROM() = delete;
   EEPROM(const Config& c) : m_interface(c){};
   byte read(const size_t index) { return static_cast<byte>(new_ref(index)); }
   void write(const size_t index, const byte val) { new_ref(index) = val; }
