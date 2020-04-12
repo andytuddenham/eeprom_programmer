@@ -11,8 +11,8 @@ class EEPROM
 {
 public:
   EEPROM(const Config& c) : m_interface(c){};
-  uint8_t read(const size_t index) { return static_cast<uint8_t>(new_ref(index)); }
-  void write(const size_t index, const uint8_t val) { new_ref(index) = val; }
+  byte read(const size_t index) { return static_cast<byte>(new_ref(index)); }
+  void write(const size_t index, const byte val) { new_ref(index) = val; }
 
   Ref operator[](const size_t index) { return new_ref(index); }
 
