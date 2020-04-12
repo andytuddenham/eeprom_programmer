@@ -14,9 +14,6 @@ public:
   EEPROM() = delete;
   EEPROM(const Config& c) : m_interface(c){};
 
-  byte read(const size_t addr) { return static_cast<byte>(new_ref(addr)); }
-  void write(const size_t addr, const byte val) { new_ref(addr) = val; }
-
   Iter begin() { return new_iter(0); }
   Iter end() { return new_iter(size()); }
 
