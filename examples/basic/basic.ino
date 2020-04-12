@@ -14,6 +14,11 @@ void setup()
   Serial.print("EEPROM (1): ");
   Serial.println(static_cast<int>(eeprom[1]), HEX);
 
+  for (byte b: eeprom)
+  {
+    Serial.println(b);
+  }
+
   Serial.println("Done");
 }
 
