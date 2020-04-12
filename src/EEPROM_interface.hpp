@@ -18,7 +18,7 @@ class EEPROM_interface
 
   byte read(size_t address) const { return m_data[address]; }
 
-  void write(size_t address, byte data) { m_data[address] = data; }
+  void write(size_t address, byte data) const { m_data[address] = data; }
 
   bool operator==(const EEPROM_interface& interface) const
   {

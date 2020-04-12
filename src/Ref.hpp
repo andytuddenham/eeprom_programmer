@@ -12,7 +12,6 @@ public:
   Ref(const EEPROM_interface& interface, size_t addr) : m_addr(addr), m_interface(interface) {}
   Ref(const Ref& ref) : Ref(ref.m_interface, ref.m_addr) {}
   operator uint8_t() const { return **this; }
-  operator byte() const { return **this; }
   operator int() const { return **this; }
 
   byte operator*() const { return m_interface.read(m_addr); }
