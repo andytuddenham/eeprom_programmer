@@ -30,6 +30,7 @@ class EEPROM_interface
   byte* m_data;
 
   friend class EEPROM;
+  friend class Ref;
 };
 
 } // namespace ext_memory
