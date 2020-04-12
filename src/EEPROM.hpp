@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EEPROM_interface.hpp"
+#include "Ref.hpp"
 #include "config.hpp"
 
 namespace ext_memory
