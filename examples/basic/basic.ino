@@ -28,7 +28,6 @@ void setup()
   printData(addr, read_data, sizeof(read_data));
 
   addr = 0;
-  // printData(addr, &eeprom.get<byte>(addr), 1);
   byte read_data2[64];
   eeprom.get_array(addr, read_data2);
   printData(addr, read_data2, sizeof(read_data2));

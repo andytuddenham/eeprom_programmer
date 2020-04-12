@@ -32,7 +32,7 @@ struct Config
 };
 
 constexpr size_t AT28C64_size = static_cast<size_t>(pow(2, 13)) - 1;
-constexpr size_t AT28C256_size = static_cast<size_t>(pow(2, 13)) - 1;
+constexpr size_t AT28C256_size = static_cast<size_t>(pow(2, 15)) - 1;
 constexpr Config suggested_AT28C64_config = {AT28C64_size, A2, A3, 10, A4, A5, 2, 9};
 constexpr Config suggested_AT28C256_config = {AT28C256_size, A2, A3, 10, A4, A5, 2, 9};
 
