@@ -6,24 +6,32 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-EEPROMP	KEYWORD1
+EEPROM	KEYWORD1
+Config	KEYWORD1
+Ref KEYWORD1
+Iter	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-getEeprom	KEYWORD2
-setChip	KEYWORD2
-readByte	KEYWORD2
-readArray	KEYWORD2
-writeByte	KEYWORD2
-writeArray	KEYWORD2
-printContents	KEYWORD2
+addr	KEYWORD2
+begin	KEYWORD2
+end	KEYWORD2
+erase	KEYWORD2
+fill	KEYWORD2
+get	KEYWORD2
+set	KEYWORD2
+get_array	KEYWORD2
+set_array	KEYWORD2
+size	KEYWORD2
+get_content_in_chunks   KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
-AT28C64	LITERAL1
-AT28C256	LITERAL1
-
+AT28C64_size	LITERAL1
+AT28C256_size	LITERAL1
+suggested_AT28C64_config	LITERAL1
+suggested_AT28C256_config	LITERAL1
