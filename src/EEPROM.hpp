@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EEPROM_Interface.hpp"
+#include "EEPROM_interface.hpp"
 #include "config.hpp"
 
 namespace ext_memory
@@ -14,7 +14,7 @@ public:
   size_t size() { return m_interface.m_config.size; }
 
 private:
-  const EEPROM_Interface m_interface;
+  const EEPROM_interface m_interface;
 };
 
 } // namespace ext_memory

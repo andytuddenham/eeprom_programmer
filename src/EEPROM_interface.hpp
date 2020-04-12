@@ -11,10 +11,10 @@
 namespace ext_memory
 {
 
-class EEPROM_Interface
+class EEPROM_interface
 {
 
-  EEPROM_Interface(const Config& c) : m_config(c) { m_data = new byte[c.size]; }
+  EEPROM_interface(const Config& c) : m_config(c) { m_data = new byte[c.size]; }
 
   byte read(size_t address) const { return m_data[address]; }
 
