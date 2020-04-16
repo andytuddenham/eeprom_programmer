@@ -180,17 +180,22 @@ bool EEPROMP::writeArray(uint16_t startAddress, byte *data, int size) const
   return true;
 }
 
-bool EEPROMP::erase() const
+bool EEPROMP::erase(byte fillValue) const
 {
   if (_endAddress == 0)
     return false;
 
   for (int address = 0; address <= _endAddress; address++)
   {
-    if (!writeByte(address, 0xff))
+    if (!writeByte(address, fillValue))
       return false;
   }
   return true;
+}
+
+bool EEPROMP::erase() const
+{
+  return (erase(0xff));
 }
 
 bool EEPROMP::printContents(void (*callback)(uint16_t address, byte *data, size_t dataSize)) const
