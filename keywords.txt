@@ -18,6 +18,7 @@ readByte	KEYWORD2
 readArray	KEYWORD2
 writeByte	KEYWORD2
 writeArray	KEYWORD2
+erase	KEYWORD2
 printContents	KEYWORD2
 
 #######################################
